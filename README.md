@@ -1,6 +1,7 @@
+#Student Result Calculator
 A Java Swing desktop application that simplifies student academic performance analysis.
 
-✨ Features
+#✨ Features
 
 Calculate total marks and average
 
@@ -14,7 +15,7 @@ Validate marks from 0 to 100
 
 Colorful graphical user interface
 
-🛠️ Technologies Used
+#🛠️ Technologies Used
 
 Java
 
@@ -22,7 +23,7 @@ Java Swing
 
 Java AWT
 
-▶️ How to Run
+#▶️ How to Run
 
 Install the Java JDK.
 
