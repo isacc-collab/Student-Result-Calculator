@@ -1,2 +1,37 @@
-# Student-Result-Calculator
-🎓 Student Result Calculator is a Java Swing desktop application featuring automatic total and average calculation, grade evaluation, subject-wise PASS/FAIL status, and highest-mark identification. Built with Java, AWT, and a modern, colourful interface to simplify student performance analysis and demonstrate practical programming skills.
+A Java Swing desktop application that simplifies student academic performance analysis.
+
+✨ Features
+
+Calculate total marks and average
+
+Automatically assign grades
+
+Display subject-wise PASS/FAIL status
+
+Identify the highest-scoring subject
+
+Validate marks from 0 to 100
+
+Colorful graphical user interface
+
+🛠️ Technologies Used
+
+Java
+
+Java Swing
+
+Java AWT
+
+▶️ How to Run
+
+Install the Java JDK.
+
+Download or clone this repository.
+
+Open the project in VS Code.
+
+Compile and run StudentResultApp.java.
+
+👨‍💻 Author
+
+Student Result Calculator — Java Mini Project
