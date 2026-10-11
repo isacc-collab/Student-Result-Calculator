@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Result Calculator</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 12px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #f3e8ff);
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 20px auto;
+      padding: 24px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px #33415525;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4f46e5;
+      font-size: 27px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+
+    .subjects {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 9px;
+      background: #4f46e5;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3730a3;
+    }
+
+    .reset {
+      background: #64748b;
+      margin-top: 10px;
+    }
+
+    #result {
+      display: none;
+      margin-top: 24px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #eef2ff;
+      overflow-wrap: anywhere;
+    }
+
+    #result h2 {
+      color: #4338ca;
+    }
+
+    .pass {
+      color: #15803d;
+      font-weight: bold;
+    }
+
+    .fail {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    @media (max-width: 420px) {
+      .container {
+        padding: 17px;
+        margin: 5px auto;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      .subjects {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>🎓 Student Result Calculator</h1>
+    <p class="subtitle">Calculate marks, average and grades</p>
+
+    <label for="studentName">Student Name</label>
+    <input id="studentName" type="text"
+           placeholder="Enter student name" maxlength="100">
+
+    <div class="subjects">
+      <div>
+        <label for="fcs">FCS</label>
+        <input id="fcs" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+      <div>
+        <label for="ds">Data Structures (DS)</label>
+        <input id="ds" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+      <div>
+        <label for="os">Operating Systems (OS)</label>
+        <input id="os" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+      <div>
+        <label for="dpco">DPCO</label>
+        <input id="dpco" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+      <div>
+        <label for="maths">Mathematics</label>
+        <input id="maths" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+      <div>
+        <label for="java">Java Programming</label>
+        <input id="java" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+      <div>
+        <label for="drrm">DRRM</label>
+        <input id="drrm" type="number" min="0" max="100"
+               placeholder="0–100">
+      </div>
+    </div>
+
+    <button onclick="calculateResult()">Calculate Result</button>
+    <button class="reset" onclick="resetForm()">Clear</button>
+
+    <section id="result" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const subjects = [
+      { id: "fcs", name: "FCS" },
+      { id: "ds", name: "Data Structures (DS)" },
+      { id: "os", name: "Operating Systems (OS)" },
+      { id: "dpco", name: "DPCO" },
+      { id: "maths", name: "Mathematics" },
+      { id: "java", name: "Java Programming" },
+      { id: "drrm", name: "DRRM" }
+    ];
+
+    function calculateResult() {
+      const name = document.getElementById("studentName").value.trim();
+
+      if (!name) {
+        alert("Please enter the student name.");
+        return;
+      }
+
+      const marks = [];
+
+      for (const subject of subjects) {
+        const input = document.getElementById(subject.id);
+        const value = input.valueAsNumber;
+
+        if (
+          input.value.trim() === "" ||
+          !Number.isInteger(value) ||
+          value < 0 ||
+          value > 100
+        ) {
+          alert("Enter a whole-number mark from 0 to 100 for every subject.");
+          input.focus();
+          return;
+        }
+
+        marks.push({
+          name: subject.name,
+          mark: value
+        });
+      }
+
+      const total = marks.reduce((sum, item) => sum + item.mark, 0);
+      const average = total / marks.length;
+      const grade = average >= 80 ? "A" :
+                    average >= 60 ? "B" :
+                    average >= 40 ? "C" : "FAIL";
+
+      const passed = marks.every(item => item.mark >= 40);
+      const highest = Math.max(...marks.map(item => item.mark));
+
+      const result = document.getElementById("result");
+
+      result.innerHTML = `
+        <h2>Result Summary</h2>
+        <p><strong>Student:</strong> ${escapeHTML(name)}</p>
+        <p><strong>Total:</strong> ${total} / 700</p>
+        <p><strong>Average:</strong> ${average.toFixed(2)}%</p>
+        <p><strong>Grade:</strong> ${grade}</p>
+        <p><strong>Overall Result:</strong>
+          <span class="${passed ? "pass" : "fail"}">
+            ${passed ? "PASS" : "FAIL"}
+          </span>
+        </p>
+        <h3>Subject Results</h3>
+        ${marks.map(item => `
+          <p>${escapeHTML(item.name)}: ${item.mark}/100 —
+            <span class="${item.mark >= 40 ? "pass" : "fail"}">
+              ${item.mark >= 40 ? "PASS" : "FAIL"}
+            </span>
+          </p>
+        `).join("")}
+        <p><strong>Highest Mark:</strong> ${highest}</p>
+        <p><strong>Highest-Scoring Subject(s):</strong>
+          ${marks.filter(item => item.mark === highest)
+            .map(item => escapeHTML(item.name)).join(", ")}
+        </p>
+      `;
+
+      result.style.display = "block";
+      result.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function escapeHTML(value) {
+      return value.replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    function resetForm() {
+      document.getElementById("studentName").value = "";
+      subjects.forEach(subject => {
+        document.getElementById(subject.id).value = "";
+      });
+
+      const result = document.getElementById("result");
+      result.innerHTML = "";
+      result.style.display = "none";
+    }
+  </script>
+</body>
+</html>
+  
