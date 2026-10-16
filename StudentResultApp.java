@@ -41,6 +41,9 @@ public class StudentResultApp {
         "Subject 7"
     };
 
+    // Example credits supplied for this project. Verify these against the official syllabus.
+    double[] credits = {3, 4, 4, 3, 4, 3, 2};
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new StudentResultApp().createApp());
     }
@@ -223,7 +226,7 @@ styleInput(nameField);
         gradeCard.setBorder(new EmptyBorder(12, 15, 12, 15));
         gradeCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
 
-        JLabel gradeTitle = new JLabel("YOUR GRADE");
+        JLabel gradeTitle = new JLabel("SEMESTER GPA");
         gradeTitle.setForeground(Color.GRAY);
         gradeTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -285,6 +288,13 @@ styleInput(nameField);
         highestLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         highestLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         content.add(highestLabel);
+
+        content.add(Box.createVerticalStrut(8));
+        JLabel cgpaNote = new JLabel("CGPA requires results and credits from all semesters.");
+        cgpaNote.setFont(new Font("SansSerif", Font.ITALIC, 12));
+        cgpaNote.setForeground(Color.GRAY);
+        cgpaNote.setAlignmentX(Component.CENTER_ALIGNMENT);
+        content.add(cgpaNote);
 
         content.add(Box.createVerticalStrut(16));
 
@@ -352,7 +362,7 @@ styleInput(nameField);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // CALCULATE
+    // CALCULATE R2025 grades and credit-weighted semester GPA
     void calculateResult() {
         String name = nameField.getText().trim();
 
@@ -362,7 +372,6 @@ styleInput(nameField);
         }
 
         int[] marks = new int[7];
-
         for (int i = 0; i < markFields.length; i++) {
             try {
                 marks[i] = Integer.parseInt(markFields[i].getText().trim());
@@ -393,59 +402,72 @@ styleInput(nameField);
         int highest = marks[0];
         String highestSubject = subjects[0];
         boolean passed = true;
+        double weightedGradePoints = 0.0;
+        double totalCredits = 0.0;
 
         for (int i = 0; i < marks.length; i++) {
-            total += marks[i];
-
-            if (marks[i] < 40) {
-                passed = false;
-            }
-
-            if (marks[i] > highest) {
-                highest = marks[i];
+            int mark = marks[i];
+            total += mark;
+            if (mark < 50) passed = false;
+            if (mark > highest) {
+                highest = mark;
                 highestSubject = subjects[i];
             }
 
-            if (marks[i] >= 40) {
-                subjectResults[i].setText("✓ PASS  •  " + marks[i] + "/100");
-                subjectResults[i].setForeground(GREEN);
-            } else {
-                subjectResults[i].setText("✕ FAIL  •  " + marks[i] + "/100");
-                subjectResults[i].setForeground(RED);
-            }
+            String letterGrade = getLetterGrade(mark);
+            double gradePoint = getGradePoint(mark);
+            weightedGradePoints += credits[i] * gradePoint;
+            totalCredits += credits[i];
+
+            String status = mark >= 50 ? "PASS" : "FAIL";
+            String detail = String.format(
+                "%s  |  GP: %s  |  %d/100  |  %s credits  |  %s",
+                letterGrade,
+                gradePoint == 6.5 ? "6.5" : String.format("%.0f", gradePoint),
+                mark,
+                credits[i] == Math.floor(credits[i]) ? String.format("%.0f", credits[i]) : credits[i],
+                status
+            );
+            subjectResults[i].setText(detail);
+            subjectResults[i].setForeground(mark >= 50 ? GREEN : RED);
         }
 
         double average = total / 7.0;
-
-        String grade;
-        if (average >= 80) {
-            grade = "A GRADE";
-        } else if (average >= 60) {
-            grade = "B GRADE";
-        } else if (average >= 40) {
-            grade = "C GRADE";
-        } else {
-            grade = "FAIL";
-        }
+        double semesterGpa = weightedGradePoints / totalCredits;
 
         resultName.setText(name);
-        gradeLabel.setText(grade);
-        gradeLabel.setForeground(grade.equals("FAIL") ? RED : GREEN);
-
+        gradeLabel.setText(String.format("%.2f / 10.00", semesterGpa));
+        gradeLabel.setForeground(passed ? GREEN : RED);
         totalLabel.setText(total + " / 700");
         averageLabel.setText(String.format("%.2f%%", average));
-
-        overallLabel.setText(
-            passed ? "✓ OVERALL PASS" : "✕ OVERALL FAIL"
-        );
+        overallLabel.setText(passed ? "✓ ALL SUBJECTS CLEARED" : "✕ REAPPEARANCE REQUIRED");
         overallLabel.setForeground(passed ? GREEN : RED);
+        highestLabel.setText("★ Highest Mark: " + highestSubject + " — " + highest);
 
-        highestLabel.setText(
-            "★ Highest Mark: " + highestSubject + " — " + highest
-        );
-
-        // Show only the result page
         cardLayout.show(cards, "RESULT");
+    }
+
+    // R2025 Regulation grade bands supplied by the user.
+    double getGradePoint(int mark) {
+        if (mark >= 91) return 10.0; // S
+        if (mark >= 81) return 9.0;  // A+
+        if (mark >= 71) return 8.0;  // A
+        if (mark >= 66) return 7.0;  // B+
+        if (mark >= 61) return 6.5;  // B
+        if (mark >= 56) return 6.0;  // C+
+        if (mark >= 50) return 5.0;  // C
+        return 0.0;                  // U
+    }
+
+    String getLetterGrade(int mark) {
+        if (mark >= 91) return "S";
+        if (mark >= 81) return "A+";
+        if (mark >= 71) return "A";
+        if (mark >= 66) return "B+";
+        if (mark >= 61) return "B";
+        if (mark >= 56) return "C+";
+        if (mark >= 50) return "C";
+        return "U";
     }
 
     void showError(String message, JTextField field) {
